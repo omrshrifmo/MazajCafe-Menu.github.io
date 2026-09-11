@@ -3,6 +3,252 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Mazaj Cafe - مزاج</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="mazaj.ico">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    .gallery {
+      min-height: 100vh;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .gallery-image {
+      display: block;
+      width: auto;
+      max-width: 45%;
+      max-height: 80vh;
+      height: auto;
+      object-fit: contain;
+      border-radius: 10px;
+      cursor: zoom-in;
+      transition: transform 0.25s ease;
+    }
+
+    .gallery-image:hover {
+      transform: scale(1.03);
+    }
+
+    .zoom-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: #000;
+      cursor: zoom-out;
+    }
+
+    .zoom-overlay.active {
+      display: flex;
+    }
+
+    .zoomed-image {
+      max-width: 95vw;
+      max-height: 95vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 8px;
+      animation: zoomIn 0.25s ease;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 15px;
+      right: 25px;
+      z-index: 2;
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 42px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .gallery {
+        flex-direction: column;
+      }
+
+      .gallery-image {
+        max-width: 100%;
+        max-height: 75vh;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="gallery">
+    <img
+      src="mazaj1.png"
+      alt=""
+      class="gallery-image"
+    >
+
+    <img
+      src="mazaj2.pngg"
+      alt=""
+      class="gallery-image"
+    >
+  </main>
+
+  <div
+    class="zoom-overlay"
+    id="zoomOverlay"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Fullscreen image viewer"
+  >
+    <button
+      class="close-button"
+      id="closeButton"
+      aria-label="Close image"
+    >
+      &times;
+    </button>
+
+    <img
+      src=""
+      alt=""
+      class="zoomed-image"
+      id="zoomedImage"
+    >
+  </div>
+
+  <script>
+    const galleryImages = document.querySelectorAll(".gallery-image");
+    const zoomOverlay = document.getElementById("zoomOverlay");
+    const zoomedImage = document.getElementById("zoomedImage");
+    const closeButton = document.getElementById("closeButton");
+
+    async function openZoom(image) {
+      zoomedImage.src = image.src;
+      zoomedImage.alt = image.alt;
+
+      zoomOverlay.classList.add("active");
+      document.body.style.overflow = "hidden";
+
+      // Enter fullscreen after the user taps an image
+      try {
+        if (!document.fullscreenElement) {
+          await zoomOverlay.requestFullscreen();
+        }
+      } catch (error) {
+        console.log("Fullscreen was not available:", error);
+      }
+
+      // Request landscape mode when supported
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock("landscape");
+        }
+      } catch (error) {
+        console.log("Landscape lock was not available:", error);
+      }
+    }
+
+    async function closeZoom() {
+      try {
+        if (screen.orientation && screen.orientation.unlock) {
+          screen.orientation.unlock();
+        }
+      } catch (error) {
+        console.log("Orientation unlock was not available:", error);
+      }
+
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+        }
+      } catch (error) {
+        console.log("Fullscreen exit failed:", error);
+      }
+
+      zoomOverlay.classList.remove("active");
+      zoomedImage.src = "";
+      document.body.style.overflow = "";
+    }
+
+    galleryImages.forEach(function (image) {
+      image.addEventListener("click", function () {
+        openZoom(image);
+      });
+    });
+
+    closeButton.addEventListener("click", closeZoom);
+
+    zoomOverlay.addEventListener("click", function (event) {
+      if (event.target === zoomOverlay) {
+        closeZoom();
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        closeZoom();
+      }
+    });
+
+    // Close the overlay if the browser exits fullscreen
+    document.addEventListener("fullscreenchange", function () {
+      if (!document.fullscreenElement && zoomOverlay.classList.contains("active")) {
+        zoomOverlay.classList.remove("active");
+        zoomedImage.src = "";
+        document.body.style.overflow = "";
+      }
+    });
+  </script>
+
+</body>
+</html>
+
+--------
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mazaj Cafe - مزاج</title>
   <link rel="Mazaj - مزاج" type="image/x-icon" href="/mazaj.ico" href="mazaj.ico">
 
