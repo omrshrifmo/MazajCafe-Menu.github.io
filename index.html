@@ -1,39 +1,174 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Mazaj Cafe - مزاج كافيه</title>
+  <title>مزاج كافيه</title>
 
   <link rel="icon" type="image/png" href="mazaj.ico">
 
   <style>
+    :root {
+      --gold: #d6ad60;
+      --gold-light: #f2d18b;
+      --dark: #080808;
+      --panel: #151515;
+      --text-muted: #c8c8c8;
+    }
+
     * {
       box-sizing: border-box;
     }
 
     html,
     body {
+      width: 100%;
       min-height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
     }
 
     body {
-      margin: 0;
       background: #000;
       color: #fff;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Tahoma, sans-serif;
     }
 
-    /* Main gallery */
-    .gallery {
+    button {
+      font: inherit;
+    }
+
+    /* General pages */
+    .page {
       min-height: 100vh;
+      width: 100%;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Welcome page */
+    .welcome-page {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      text-align: center;
+      background:
+        radial-gradient(circle at center, #282828 0%, #0c0c0c 48%, #000 100%);
+    }
+
+    .welcome-card {
+      width: min(100%, 560px);
+      padding: 36px 24px;
+      border: 1px solid rgba(214, 173, 96, 0.35);
+      border-radius: 24px;
+      background: rgba(15, 15, 15, 0.88);
+      box-shadow:
+        0 0 35px rgba(214, 173, 96, 0.12),
+        0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .welcome-logo {
+      display: block;
+      width: min(72vw, 300px);
+      max-height: 260px;
+      margin: 0 auto 26px;
+      object-fit: contain;
+    }
+
+    .welcome-title {
+      margin: 0 0 28px;
+      color: var(--gold-light);
+      font-size: clamp(25px, 5vw, 42px);
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .proceed-button,
+    .back-button {
+      border: 1px solid var(--gold);
+      border-radius: 14px;
+      background: linear-gradient(135deg, #d6ad60, #a7782d);
+      color: #111;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(214, 173, 96, 0.2);
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+    }
+
+    .proceed-button {
+      min-width: min(100%, 310px);
+      padding: 15px 24px;
+      font-size: clamp(18px, 4vw, 23px);
+    }
+
+    .proceed-button:hover,
+    .back-button:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(214, 173, 96, 0.35);
+    }
+
+    .proceed-button:active,
+    .back-button:active,
+    .control-button:active,
+    .nav-button:active {
+      transform: scale(0.96);
+    }
+
+    /* Gallery page */
+    .gallery-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #000;
+    }
+
+    .gallery-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 68px;
+      padding: 12px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(8, 8, 8, 0.96);
+      backdrop-filter: blur(10px);
+    }
+
+    .page-status {
+      color: var(--gold-light);
+      font-size: clamp(14px, 3vw, 19px);
+      font-weight: 700;
+    }
+
+    .back-button {
+      padding: 9px 14px;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .gallery {
+      flex: 1;
+      min-height: calc(100vh - 68px);
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       align-items: center;
       gap: 20px;
       padding: 20px;
+      overscroll-behavior-x: none;
     }
 
     .gallery-image {
@@ -45,6 +180,8 @@
       object-fit: contain;
       border-radius: 10px;
       cursor: zoom-in;
+      user-select: none;
+      -webkit-user-drag: none;
       transition: transform 0.25s ease;
     }
 
@@ -62,13 +199,13 @@
       justify-content: center;
       align-items: center;
       background: #000;
+      overscroll-behavior: none;
     }
 
     .zoom-overlay.active {
       display: flex;
     }
 
-    /* Image viewing area */
     .viewer {
       position: absolute;
       inset: 0;
@@ -77,6 +214,7 @@
       align-items: center;
       overflow: hidden;
       touch-action: none;
+      overscroll-behavior: none;
       cursor: grab;
     }
 
@@ -99,7 +237,7 @@
       will-change: transform;
     }
 
-    /* Top controls */
+    /* Viewer controls */
     .top-controls {
       position: absolute;
       top: 15px;
@@ -107,7 +245,8 @@
       z-index: 5;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
+      direction: ltr;
       transform: translateX(-50%);
     }
 
@@ -116,7 +255,7 @@
     .nav-button {
       border: 1px solid rgba(255, 255, 255, 0.35);
       border-radius: 8px;
-      background: rgba(30, 30, 30, 0.85);
+      background: rgba(30, 30, 30, 0.88);
       color: #fff;
       cursor: pointer;
       user-select: none;
@@ -126,14 +265,21 @@
     .control-button:hover,
     .close-button:hover,
     .nav-button:hover {
-      background: rgba(90, 90, 90, 0.9);
+      background: rgba(90, 90, 90, 0.95);
     }
 
     .control-button {
       min-width: 44px;
       height: 42px;
-      padding: 0 12px;
+      padding: 0 11px;
       font-size: 20px;
+    }
+
+    .zoom-level {
+      min-width: 55px;
+      color: #fff;
+      text-align: center;
+      font-size: 14px;
     }
 
     .close-button {
@@ -147,13 +293,12 @@
       line-height: 1;
     }
 
-    /* Previous and next buttons */
     .nav-button {
       position: absolute;
       top: 50%;
       z-index: 5;
-      width: 52px;
-      height: 70px;
+      width: 54px;
+      height: 72px;
       font-size: 38px;
       line-height: 1;
       transform: translateY(-50%);
@@ -167,29 +312,34 @@
       right: 15px;
     }
 
-    /* Image counter */
     .image-counter {
       position: absolute;
       bottom: 18px;
       left: 50%;
       z-index: 5;
-      padding: 7px 12px;
+      padding: 7px 13px;
       border-radius: 20px;
-      background: rgba(30, 30, 30, 0.8);
+      background: rgba(30, 30, 30, 0.85);
       color: #fff;
+      direction: ltr;
       font-size: 14px;
       transform: translateX(-50%);
     }
 
-    .zoom-level {
-      min-width: 55px;
-      text-align: center;
-      font-size: 14px;
-    }
-
     @media (max-width: 600px) {
+      .welcome-card {
+        padding: 28px 18px;
+      }
+
+      .gallery-header {
+        min-height: 62px;
+        padding: 10px 12px;
+      }
+
       .gallery {
+        min-height: calc(100vh - 62px);
         flex-direction: column;
+        padding: 16px 10px;
       }
 
       .gallery-image {
@@ -208,6 +358,13 @@
         right: 15px;
       }
 
+      .control-button {
+        min-width: 38px;
+        height: 38px;
+        padding: 0 9px;
+        font-size: 18px;
+      }
+
       .nav-button {
         width: 44px;
         height: 60px;
@@ -221,41 +378,81 @@
       .next-button {
         right: 8px;
       }
-
-      .control-button {
-        min-width: 38px;
-        height: 38px;
-        padding: 0 9px;
-        font-size: 18px;
-      }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Gallery -->
-  <main class="gallery">
-    <img
-      src="mazaj1.png"
-      alt="Mazaj Cafe image 1"
-      class="gallery-image"
-    >
+  <!-- Welcome page -->
+  <section
+    class="page welcome-page"
+    id="welcomePage"
+    aria-labelledby="welcomeTitle"
+  >
+    <div class="welcome-card">
+      <img
+        src="mazaj.png"
+        alt="شعار كافيه مزاج"
+        class="welcome-logo"
+      >
 
-    <img
-      src="mazaj2.png"
-      alt="Mazaj Cafe image 2"
-      class="gallery-image"
-    >
-  </main>
+      <h1 class="welcome-title" id="welcomeTitle">
+        أهلاً بكم في كافيه مزاج
+      </h1>
 
-  <!-- Fullscreen image viewer -->
+      <button
+        class="proceed-button"
+        id="proceedButton"
+        type="button"
+      >
+        لفتح المنيو اضغط هنا
+      </button>
+    </div>
+  </section>
+
+  <!-- Gallery page -->
+  <section
+    class="page gallery-page hidden"
+    id="galleryPage"
+    aria-label="قائمة مزاج كافيه"
+  >
+    <header class="gallery-header">
+      <div class="page-status">
+        الصفحة 2 من 2 — المنيو
+      </div>
+
+      <button
+        class="back-button"
+        id="backButton"
+        type="button"
+      >
+        العودة للترحيب
+      </button>
+    </header>
+
+    <main class="gallery">
+      <img
+        src="mazaj1.png"
+        alt="منيو مزاج كافيه - الصفحة الأولى"
+        class="gallery-image"
+      >
+
+      <img
+        src="mazaj2.png"
+        alt="منيو مزاج كافيه - الصفحة الثانية"
+        class="gallery-image"
+      >
+    </main>
+  </section>
+
+  <!-- Fullscreen viewer -->
   <div
     class="zoom-overlay"
     id="zoomOverlay"
     role="dialog"
     aria-modal="true"
-    aria-label="Fullscreen image viewer"
+    aria-label="عارض صور المنيو"
   >
     <div class="viewer" id="viewer">
       <img
@@ -271,18 +468,23 @@
         class="control-button"
         id="zoomOutButton"
         type="button"
-        aria-label="Zoom out"
+        aria-label="تصغير"
       >
         −
       </button>
 
-      <span class="zoom-level" id="zoomLevel">100%</span>
+      <span
+        class="zoom-level"
+        id="zoomLevel"
+      >
+        100%
+      </span>
 
       <button
         class="control-button"
         id="zoomInButton"
         type="button"
-        aria-label="Zoom in"
+        aria-label="تكبير"
       >
         +
       </button>
@@ -291,7 +493,7 @@
         class="control-button"
         id="resetButton"
         type="button"
-        aria-label="Reset zoom"
+        aria-label="إعادة ضبط التكبير"
       >
         Reset
       </button>
@@ -301,7 +503,7 @@
       class="close-button"
       id="closeButton"
       type="button"
-      aria-label="Close image"
+      aria-label="إغلاق"
     >
       &times;
     </button>
@@ -310,7 +512,7 @@
       class="nav-button previous-button"
       id="previousButton"
       type="button"
-      aria-label="Previous image"
+      aria-label="الصورة السابقة"
     >
       &#10094;
     </button>
@@ -319,17 +521,26 @@
       class="nav-button next-button"
       id="nextButton"
       type="button"
-      aria-label="Next image"
+      aria-label="الصورة التالية"
     >
       &#10095;
     </button>
 
-    <div class="image-counter" id="imageCounter">
+    <div
+      class="image-counter"
+      id="imageCounter"
+    >
       1 / 2
     </div>
   </div>
 
   <script>
+    const welcomePage = document.getElementById("welcomePage");
+    const galleryPage = document.getElementById("galleryPage");
+
+    const proceedButton = document.getElementById("proceedButton");
+    const backButton = document.getElementById("backButton");
+
     const galleryImages = Array.from(
       document.querySelectorAll(".gallery-image")
     );
@@ -360,11 +571,31 @@
 
     let pointers = new Map();
     let lastPinchDistance = null;
+
     let isDragging = false;
     let dragStartX = 0;
     let dragStartY = 0;
     let startTranslateX = 0;
     let startTranslateY = 0;
+
+    let swipeStartX = 0;
+    let swipeStartY = 0;
+
+    function showGalleryPage() {
+      welcomePage.classList.add("hidden");
+      galleryPage.classList.remove("hidden");
+
+      document.title = "منيو مزاج كافيه";
+      window.scrollTo(0, 0);
+    }
+
+    function showWelcomePage() {
+      galleryPage.classList.add("hidden");
+      welcomePage.classList.remove("hidden");
+
+      document.title = "مزاج كافيه";
+      window.scrollTo(0, 0);
+    }
 
     function updateImageTransform() {
       zoomedImage.style.transform =
@@ -407,6 +638,10 @@
       updateImageTransform();
     }
 
+    function changeZoom(amount) {
+      setZoom(scale + amount);
+    }
+
     function updateImageInfo() {
       imageCounter.textContent =
         `${currentIndex + 1} / ${galleryImages.length}`;
@@ -432,7 +667,10 @@
       document.body.style.overflow = "hidden";
 
       try {
-        if (!document.fullscreenElement && zoomOverlay.requestFullscreen) {
+        if (
+          !document.fullscreenElement &&
+          zoomOverlay.requestFullscreen
+        ) {
           await zoomOverlay.requestFullscreen();
         }
       } catch (error) {
@@ -458,7 +696,10 @@
       }
 
       try {
-        if (document.fullscreenElement && document.exitFullscreen) {
+        if (
+          document.fullscreenElement &&
+          document.exitFullscreen
+        ) {
           await document.exitFullscreen();
         }
       } catch (error) {
@@ -479,17 +720,34 @@
       showImage(currentIndex + 1);
     }
 
-    function changeZoom(amount) {
-      setZoom(scale + amount);
+    function getPinchDistance() {
+      const activePointers = Array.from(pointers.values());
+
+      if (activePointers.length < 2) {
+        return 0;
+      }
+
+      const firstPointer = activePointers[0];
+      const secondPointer = activePointers[1];
+
+      return Math.hypot(
+        secondPointer.x - firstPointer.x,
+        secondPointer.y - firstPointer.y
+      );
     }
 
-    // Open the clicked gallery image
+    // Welcome and page navigation
+    proceedButton.addEventListener("click", showGalleryPage);
+    backButton.addEventListener("click", showWelcomePage);
+
+    // Open an image
     galleryImages.forEach(function (image, index) {
       image.addEventListener("click", function () {
         openZoom(index);
       });
     });
 
+    // Viewer buttons
     closeButton.addEventListener("click", closeZoom);
     previousButton.addEventListener("click", showPreviousImage);
     nextButton.addEventListener("click", showNextImage);
@@ -504,7 +762,7 @@
 
     resetButton.addEventListener("click", resetZoom);
 
-    // Clicking outside the image closes the viewer
+    // Close when clicking empty viewer space at normal zoom
     viewer.addEventListener("click", function (event) {
       if (event.target === viewer && scale === 1) {
         closeZoom();
@@ -517,16 +775,16 @@
       function (event) {
         event.preventDefault();
 
-        const zoomAmount = event.deltaY < 0
+        const amount = event.deltaY < 0
           ? ZOOM_STEP
           : -ZOOM_STEP;
 
-        changeZoom(zoomAmount);
+        changeZoom(amount);
       },
       { passive: false }
     );
 
-    // Double-click zoom
+    // Double-click or double-tap style zoom
     zoomedImage.addEventListener("dblclick", function (event) {
       event.preventDefault();
 
@@ -537,15 +795,19 @@
       }
     });
 
-    // Pointer down: start dragging or prepare pinch zoom
+    // Pointer down
     viewer.addEventListener("pointerdown", function (event) {
       event.preventDefault();
 
       viewer.setPointerCapture(event.pointerId);
+
       pointers.set(event.pointerId, {
         x: event.clientX,
         y: event.clientY
       });
+
+      swipeStartX = event.clientX;
+      swipeStartY = event.clientY;
 
       if (pointers.size === 1 && scale > 1) {
         isDragging = true;
@@ -563,7 +825,7 @@
       }
     });
 
-    // Pointer movement: drag or pinch zoom
+    // Pointer movement: drag or pinch
     viewer.addEventListener("pointermove", function (event) {
       if (!pointers.has(event.pointerId)) {
         return;
@@ -589,8 +851,11 @@
       }
 
       if (isDragging && scale > 1) {
-        translateX = startTranslateX + event.clientX - dragStartX;
-        translateY = startTranslateY + event.clientY - dragStartY;
+        translateX =
+          startTranslateX + event.clientX - dragStartX;
+
+        translateY =
+          startTranslateY + event.clientY - dragStartY;
 
         limitPan();
         updateImageTransform();
@@ -598,6 +863,8 @@
     });
 
     function finishPointer(event) {
+      const wasLastPointer = pointers.size === 1;
+
       pointers.delete(event.pointerId);
 
       if (pointers.size < 2) {
@@ -608,31 +875,27 @@
         isDragging = false;
         viewer.classList.remove("dragging");
       }
+
+      // Swipe only when the image is not zoomed
+      if (wasLastPointer && scale === 1) {
+        const distanceX = event.clientX - swipeStartX;
+        const distanceY = event.clientY - swipeStartY;
+
+        if (
+          Math.abs(distanceX) > 60 &&
+          Math.abs(distanceX) > Math.abs(distanceY)
+        ) {
+          if (distanceX < 0) {
+            showNextImage();
+          } else {
+            showPreviousImage();
+          }
+        }
+      }
     }
 
     viewer.addEventListener("pointerup", finishPointer);
     viewer.addEventListener("pointercancel", finishPointer);
-    viewer.addEventListener("pointerleave", function (event) {
-      if (event.buttons === 0) {
-        finishPointer(event);
-      }
-    });
-
-    function getPinchDistance() {
-      const activePointers = Array.from(pointers.values());
-
-      if (activePointers.length < 2) {
-        return 0;
-      }
-
-      const firstPointer = activePointers[0];
-      const secondPointer = activePointers[1];
-
-      return Math.hypot(
-        secondPointer.x - firstPointer.x,
-        secondPointer.y - firstPointer.y
-      );
-    }
 
     // Keyboard controls
     document.addEventListener("keydown", function (event) {
@@ -646,7 +909,10 @@
         showPreviousImage();
       } else if (event.key === "ArrowRight") {
         showNextImage();
-      } else if (event.key === "+" || event.key === "=") {
+      } else if (
+        event.key === "+" ||
+        event.key === "="
+      ) {
         changeZoom(ZOOM_STEP);
       } else if (event.key === "-") {
         changeZoom(-ZOOM_STEP);
@@ -655,38 +921,7 @@
       }
     });
 
-    // Swipe to change images when not zoomed
-    let swipeStartX = 0;
-    let swipeStartY = 0;
-
-    viewer.addEventListener("pointerdown", function (event) {
-      if (pointers.size === 1) {
-        swipeStartX = event.clientX;
-        swipeStartY = event.clientY;
-      }
-    });
-
-    viewer.addEventListener("pointerup", function (event) {
-      if (scale !== 1 || pointers.size !== 0) {
-        return;
-      }
-
-      const swipeDistanceX = event.clientX - swipeStartX;
-      const swipeDistanceY = event.clientY - swipeStartY;
-
-      if (
-        Math.abs(swipeDistanceX) > 60 &&
-        Math.abs(swipeDistanceX) > Math.abs(swipeDistanceY)
-      ) {
-        if (swipeDistanceX < 0) {
-          showNextImage();
-        } else {
-          showPreviousImage();
-        }
-      }
-    });
-
-    // If fullscreen is exited using the browser controls, close the viewer
+    // Close if fullscreen is exited using browser controls
     document.addEventListener("fullscreenchange", function () {
       if (
         !document.fullscreenElement &&
@@ -699,7 +934,7 @@
       }
     });
 
-    // Keep panning within bounds after resizing or rotating
+    // Keep image inside the viewer after resizing or rotating
     window.addEventListener("resize", function () {
       if (zoomOverlay.classList.contains("active")) {
         limitPan();
