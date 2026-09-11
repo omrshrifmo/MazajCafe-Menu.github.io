@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Mazaj Cafe - مزاج</title>
+  <title>Mazaj Cafe - مزاج كافيه</title>
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="mazaj.ico">
 
   <style>
@@ -26,6 +25,7 @@
       font-family: Arial, sans-serif;
     }
 
+    /* Main gallery */
     .gallery {
       min-height: 100vh;
       display: flex;
@@ -52,55 +52,139 @@
       transform: scale(1.03);
     }
 
+    /* Fullscreen viewer */
     .zoom-overlay {
       display: none;
       position: fixed;
       inset: 0;
       z-index: 1000;
+      overflow: hidden;
       justify-content: center;
       align-items: center;
-      padding: 20px;
       background: #000;
-      cursor: zoom-out;
     }
 
     .zoom-overlay.active {
       display: flex;
     }
 
+    /* Image viewing area */
+    .viewer {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    .viewer.dragging {
+      cursor: grabbing;
+    }
+
     .zoomed-image {
-      max-width: 95vw;
-      max-height: 95vh;
+      display: block;
       width: auto;
       height: auto;
+      max-width: 95vw;
+      max-height: 95vh;
       object-fit: contain;
       border-radius: 8px;
-      animation: zoomIn 0.25s ease;
+      user-select: none;
+      -webkit-user-drag: none;
+      transform: translate3d(0, 0, 0) scale(1);
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    /* Top controls */
+    .top-controls {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateX(-50%);
+    }
+
+    .control-button,
+    .close-button,
+    .nav-button {
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 8px;
+      background: rgba(30, 30, 30, 0.85);
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s ease;
+    }
+
+    .control-button:hover,
+    .close-button:hover,
+    .nav-button:hover {
+      background: rgba(90, 90, 90, 0.9);
+    }
+
+    .control-button {
+      min-width: 44px;
+      height: 42px;
+      padding: 0 12px;
+      font-size: 20px;
     }
 
     .close-button {
       position: absolute;
       top: 15px;
-      right: 25px;
-      z-index: 2;
-      border: none;
-      background: transparent;
-      color: #fff;
-      font-size: 42px;
+      right: 20px;
+      z-index: 6;
+      width: 44px;
+      height: 42px;
+      font-size: 30px;
       line-height: 1;
-      cursor: pointer;
     }
 
-    @keyframes zoomIn {
-      from {
-        transform: scale(0.8);
-        opacity: 0;
-      }
+    /* Previous and next buttons */
+    .nav-button {
+      position: absolute;
+      top: 50%;
+      z-index: 5;
+      width: 52px;
+      height: 70px;
+      font-size: 38px;
+      line-height: 1;
+      transform: translateY(-50%);
+    }
 
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
+    .previous-button {
+      left: 15px;
+    }
+
+    .next-button {
+      right: 15px;
+    }
+
+    /* Image counter */
+    .image-counter {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      z-index: 5;
+      padding: 7px 12px;
+      border-radius: 20px;
+      background: rgba(30, 30, 30, 0.8);
+      color: #fff;
+      font-size: 14px;
+      transform: translateX(-50%);
+    }
+
+    .zoom-level {
+      min-width: 55px;
+      text-align: center;
+      font-size: 14px;
     }
 
     @media (max-width: 600px) {
@@ -112,26 +196,60 @@
         max-width: 100%;
         max-height: 75vh;
       }
+
+      .top-controls {
+        top: 12px;
+        left: 15px;
+        transform: none;
+      }
+
+      .close-button {
+        top: 12px;
+        right: 15px;
+      }
+
+      .nav-button {
+        width: 44px;
+        height: 60px;
+        font-size: 30px;
+      }
+
+      .previous-button {
+        left: 8px;
+      }
+
+      .next-button {
+        right: 8px;
+      }
+
+      .control-button {
+        min-width: 38px;
+        height: 38px;
+        padding: 0 9px;
+        font-size: 18px;
+      }
     }
   </style>
 </head>
 
 <body>
 
+  <!-- Gallery -->
   <main class="gallery">
     <img
       src="mazaj1.png"
-      alt=""
+      alt="Mazaj Cafe image 1"
       class="gallery-image"
     >
 
     <img
       src="mazaj2.png"
-      alt=""
+      alt="Mazaj Cafe image 2"
       class="gallery-image"
     >
   </main>
 
+  <!-- Fullscreen image viewer -->
   <div
     class="zoom-overlay"
     id="zoomOverlay"
@@ -139,45 +257,188 @@
     aria-modal="true"
     aria-label="Fullscreen image viewer"
   >
+    <div class="viewer" id="viewer">
+      <img
+        src=""
+        alt=""
+        class="zoomed-image"
+        id="zoomedImage"
+      >
+    </div>
+
+    <div class="top-controls">
+      <button
+        class="control-button"
+        id="zoomOutButton"
+        type="button"
+        aria-label="Zoom out"
+      >
+        −
+      </button>
+
+      <span class="zoom-level" id="zoomLevel">100%</span>
+
+      <button
+        class="control-button"
+        id="zoomInButton"
+        type="button"
+        aria-label="Zoom in"
+      >
+        +
+      </button>
+
+      <button
+        class="control-button"
+        id="resetButton"
+        type="button"
+        aria-label="Reset zoom"
+      >
+        Reset
+      </button>
+    </div>
+
     <button
       class="close-button"
       id="closeButton"
+      type="button"
       aria-label="Close image"
     >
       &times;
     </button>
 
-    <img
-      src=""
-      alt=""
-      class="zoomed-image"
-      id="zoomedImage"
+    <button
+      class="nav-button previous-button"
+      id="previousButton"
+      type="button"
+      aria-label="Previous image"
     >
+      &#10094;
+    </button>
+
+    <button
+      class="nav-button next-button"
+      id="nextButton"
+      type="button"
+      aria-label="Next image"
+    >
+      &#10095;
+    </button>
+
+    <div class="image-counter" id="imageCounter">
+      1 / 2
+    </div>
   </div>
 
   <script>
-    const galleryImages = document.querySelectorAll(".gallery-image");
-    const zoomOverlay = document.getElementById("zoomOverlay");
-    const zoomedImage = document.getElementById("zoomedImage");
-    const closeButton = document.getElementById("closeButton");
+    const galleryImages = Array.from(
+      document.querySelectorAll(".gallery-image")
+    );
 
-    async function openZoom(image) {
+    const zoomOverlay = document.getElementById("zoomOverlay");
+    const viewer = document.getElementById("viewer");
+    const zoomedImage = document.getElementById("zoomedImage");
+
+    const closeButton = document.getElementById("closeButton");
+    const previousButton = document.getElementById("previousButton");
+    const nextButton = document.getElementById("nextButton");
+
+    const zoomInButton = document.getElementById("zoomInButton");
+    const zoomOutButton = document.getElementById("zoomOutButton");
+    const resetButton = document.getElementById("resetButton");
+
+    const zoomLevel = document.getElementById("zoomLevel");
+    const imageCounter = document.getElementById("imageCounter");
+
+    let currentIndex = 0;
+    let scale = 1;
+    let translateX = 0;
+    let translateY = 0;
+
+    const MIN_ZOOM = 1;
+    const MAX_ZOOM = 6;
+    const ZOOM_STEP = 0.25;
+
+    let pointers = new Map();
+    let lastPinchDistance = null;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let startTranslateX = 0;
+    let startTranslateY = 0;
+
+    function updateImageTransform() {
+      zoomedImage.style.transform =
+        `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
+
+      zoomLevel.textContent = `${Math.round(scale * 100)}%`;
+    }
+
+    function limitPan() {
+      const maxPanX = Math.max(
+        0,
+        (zoomedImage.clientWidth * scale - viewer.clientWidth) / 2
+      );
+
+      const maxPanY = Math.max(
+        0,
+        (zoomedImage.clientHeight * scale - viewer.clientHeight) / 2
+      );
+
+      translateX = Math.max(-maxPanX, Math.min(maxPanX, translateX));
+      translateY = Math.max(-maxPanY, Math.min(maxPanY, translateY));
+    }
+
+    function setZoom(newScale) {
+      scale = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newScale));
+
+      if (scale === MIN_ZOOM) {
+        translateX = 0;
+        translateY = 0;
+      }
+
+      limitPan();
+      updateImageTransform();
+    }
+
+    function resetZoom() {
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+      updateImageTransform();
+    }
+
+    function updateImageInfo() {
+      imageCounter.textContent =
+        `${currentIndex + 1} / ${galleryImages.length}`;
+    }
+
+    function showImage(index) {
+      currentIndex =
+        (index + galleryImages.length) % galleryImages.length;
+
+      const image = galleryImages[currentIndex];
+
       zoomedImage.src = image.src;
       zoomedImage.alt = image.alt;
+
+      resetZoom();
+      updateImageInfo();
+    }
+
+    async function openZoom(index) {
+      showImage(index);
 
       zoomOverlay.classList.add("active");
       document.body.style.overflow = "hidden";
 
-      // Enter fullscreen after the user taps an image
       try {
-        if (!document.fullscreenElement) {
+        if (!document.fullscreenElement && zoomOverlay.requestFullscreen) {
           await zoomOverlay.requestFullscreen();
         }
       } catch (error) {
         console.log("Fullscreen was not available:", error);
       }
 
-      // Request landscape mode when supported
       try {
         if (screen.orientation && screen.orientation.lock) {
           await screen.orientation.lock("landscape");
@@ -197,7 +458,7 @@
       }
 
       try {
-        if (document.fullscreenElement) {
+        if (document.fullscreenElement && document.exitFullscreen) {
           await document.exitFullscreen();
         }
       } catch (error) {
@@ -207,34 +468,242 @@
       zoomOverlay.classList.remove("active");
       zoomedImage.src = "";
       document.body.style.overflow = "";
+      resetZoom();
     }
 
-    galleryImages.forEach(function (image) {
+    function showPreviousImage() {
+      showImage(currentIndex - 1);
+    }
+
+    function showNextImage() {
+      showImage(currentIndex + 1);
+    }
+
+    function changeZoom(amount) {
+      setZoom(scale + amount);
+    }
+
+    // Open the clicked gallery image
+    galleryImages.forEach(function (image, index) {
       image.addEventListener("click", function () {
-        openZoom(image);
+        openZoom(index);
       });
     });
 
     closeButton.addEventListener("click", closeZoom);
+    previousButton.addEventListener("click", showPreviousImage);
+    nextButton.addEventListener("click", showNextImage);
 
-    zoomOverlay.addEventListener("click", function (event) {
-      if (event.target === zoomOverlay) {
+    zoomInButton.addEventListener("click", function () {
+      changeZoom(ZOOM_STEP);
+    });
+
+    zoomOutButton.addEventListener("click", function () {
+      changeZoom(-ZOOM_STEP);
+    });
+
+    resetButton.addEventListener("click", resetZoom);
+
+    // Clicking outside the image closes the viewer
+    viewer.addEventListener("click", function (event) {
+      if (event.target === viewer && scale === 1) {
         closeZoom();
       }
     });
 
+    // Mouse-wheel zoom
+    viewer.addEventListener(
+      "wheel",
+      function (event) {
+        event.preventDefault();
+
+        const zoomAmount = event.deltaY < 0
+          ? ZOOM_STEP
+          : -ZOOM_STEP;
+
+        changeZoom(zoomAmount);
+      },
+      { passive: false }
+    );
+
+    // Double-click zoom
+    zoomedImage.addEventListener("dblclick", function (event) {
+      event.preventDefault();
+
+      if (scale === 1) {
+        setZoom(2);
+      } else {
+        resetZoom();
+      }
+    });
+
+    // Pointer down: start dragging or prepare pinch zoom
+    viewer.addEventListener("pointerdown", function (event) {
+      event.preventDefault();
+
+      viewer.setPointerCapture(event.pointerId);
+      pointers.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY
+      });
+
+      if (pointers.size === 1 && scale > 1) {
+        isDragging = true;
+        viewer.classList.add("dragging");
+
+        dragStartX = event.clientX;
+        dragStartY = event.clientY;
+        startTranslateX = translateX;
+        startTranslateY = translateY;
+      }
+
+      if (pointers.size === 2) {
+        isDragging = false;
+        lastPinchDistance = getPinchDistance();
+      }
+    });
+
+    // Pointer movement: drag or pinch zoom
+    viewer.addEventListener("pointermove", function (event) {
+      if (!pointers.has(event.pointerId)) {
+        return;
+      }
+
+      event.preventDefault();
+
+      pointers.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY
+      });
+
+      if (pointers.size === 2) {
+        const newPinchDistance = getPinchDistance();
+
+        if (lastPinchDistance) {
+          const difference = newPinchDistance - lastPinchDistance;
+          setZoom(scale + difference * 0.01);
+        }
+
+        lastPinchDistance = newPinchDistance;
+        return;
+      }
+
+      if (isDragging && scale > 1) {
+        translateX = startTranslateX + event.clientX - dragStartX;
+        translateY = startTranslateY + event.clientY - dragStartY;
+
+        limitPan();
+        updateImageTransform();
+      }
+    });
+
+    function finishPointer(event) {
+      pointers.delete(event.pointerId);
+
+      if (pointers.size < 2) {
+        lastPinchDistance = null;
+      }
+
+      if (pointers.size === 0) {
+        isDragging = false;
+        viewer.classList.remove("dragging");
+      }
+    }
+
+    viewer.addEventListener("pointerup", finishPointer);
+    viewer.addEventListener("pointercancel", finishPointer);
+    viewer.addEventListener("pointerleave", function (event) {
+      if (event.buttons === 0) {
+        finishPointer(event);
+      }
+    });
+
+    function getPinchDistance() {
+      const activePointers = Array.from(pointers.values());
+
+      if (activePointers.length < 2) {
+        return 0;
+      }
+
+      const firstPointer = activePointers[0];
+      const secondPointer = activePointers[1];
+
+      return Math.hypot(
+        secondPointer.x - firstPointer.x,
+        secondPointer.y - firstPointer.y
+      );
+    }
+
+    // Keyboard controls
     document.addEventListener("keydown", function (event) {
+      if (!zoomOverlay.classList.contains("active")) {
+        return;
+      }
+
       if (event.key === "Escape") {
         closeZoom();
+      } else if (event.key === "ArrowLeft") {
+        showPreviousImage();
+      } else if (event.key === "ArrowRight") {
+        showNextImage();
+      } else if (event.key === "+" || event.key === "=") {
+        changeZoom(ZOOM_STEP);
+      } else if (event.key === "-") {
+        changeZoom(-ZOOM_STEP);
+      } else if (event.key === "0") {
+        resetZoom();
       }
     });
 
-    // Close the overlay if the browser exits fullscreen
+    // Swipe to change images when not zoomed
+    let swipeStartX = 0;
+    let swipeStartY = 0;
+
+    viewer.addEventListener("pointerdown", function (event) {
+      if (pointers.size === 1) {
+        swipeStartX = event.clientX;
+        swipeStartY = event.clientY;
+      }
+    });
+
+    viewer.addEventListener("pointerup", function (event) {
+      if (scale !== 1 || pointers.size !== 0) {
+        return;
+      }
+
+      const swipeDistanceX = event.clientX - swipeStartX;
+      const swipeDistanceY = event.clientY - swipeStartY;
+
+      if (
+        Math.abs(swipeDistanceX) > 60 &&
+        Math.abs(swipeDistanceX) > Math.abs(swipeDistanceY)
+      ) {
+        if (swipeDistanceX < 0) {
+          showNextImage();
+        } else {
+          showPreviousImage();
+        }
+      }
+    });
+
+    // If fullscreen is exited using the browser controls, close the viewer
     document.addEventListener("fullscreenchange", function () {
-      if (!document.fullscreenElement && zoomOverlay.classList.contains("active")) {
+      if (
+        !document.fullscreenElement &&
+        zoomOverlay.classList.contains("active")
+      ) {
         zoomOverlay.classList.remove("active");
         zoomedImage.src = "";
         document.body.style.overflow = "";
+        resetZoom();
+      }
+    });
+
+    // Keep panning within bounds after resizing or rotating
+    window.addEventListener("resize", function () {
+      if (zoomOverlay.classList.contains("active")) {
+        limitPan();
+        updateImageTransform();
       }
     });
   </script>
