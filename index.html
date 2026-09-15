@@ -16,9 +16,11 @@
     :root {
       --gold: #d6ad60;
       --gold-light: #f2d18b;
+      --gold-dark: #9d6e28;
       --black: #000;
-      --panel: rgba(28, 28, 28, 0.94);
+      --panel: rgba(28, 28, 28, 0.96);
       --border: rgba(255, 255, 255, 0.28);
+      --muted: rgba(255, 255, 255, 0.7);
     }
 
     * {
@@ -43,6 +45,11 @@
 
     button {
       font: inherit;
+    }
+
+    button:focus-visible {
+      outline: 3px solid var(--gold-light);
+      outline-offset: 3px;
     }
 
     .hidden {
@@ -74,10 +81,12 @@
     .welcome-card {
       width: min(100%, 560px);
       padding: 36px 22px;
-      border: 1px solid rgba(214, 173, 96, 0.6);
+      border: 1px solid rgba(214, 173, 96, 0.62);
       border-radius: 24px;
-      background: rgba(15, 15, 15, 0.95);
-      box-shadow: 0 0 40px rgba(214, 173, 96, 0.18);
+      background: rgba(15, 15, 15, 0.96);
+      box-shadow:
+        0 0 40px rgba(214, 173, 96, 0.18),
+        0 18px 50px rgba(0, 0, 0, 0.55);
     }
 
     .welcome-logo {
@@ -98,23 +107,40 @@
     }
 
     .proceed-button {
-      min-width: min(100%, 320px);
-      min-height: 54px;
+      min-width: min(100%, 330px);
+      min-height: 58px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
       padding: 14px 24px;
       border: 1px solid var(--gold);
-      border-radius: 14px;
+      border-radius: 16px;
       background: linear-gradient(135deg, #d6ad60, #a7782d);
       color: #111;
       font-size: clamp(18px, 4vw, 23px);
       font-weight: bold;
       cursor: pointer;
       touch-action: manipulation;
-      transition: transform 0.2s ease, filter 0.2s ease;
+      box-shadow: 0 10px 25px rgba(214, 173, 96, 0.22);
+      transition:
+        transform 0.2s ease,
+        filter 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     .proceed-button:hover {
       filter: brightness(1.12);
       transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(214, 173, 96, 0.35);
+    }
+
+    .button-icon {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.35em;
+      line-height: 1;
     }
 
     /* Gallery screen */
@@ -157,22 +183,63 @@
       overscroll-behavior-x: none;
     }
 
+    .gallery-card {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      max-width: 45%;
+      max-height: 80vh;
+      overflow: hidden;
+      border: 1px solid rgba(214, 173, 96, 0.22);
+      border-radius: 14px;
+      background: #090909;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    }
+
     .gallery-image {
       display: block;
       width: auto;
-      max-width: 45%;
+      max-width: 100%;
       max-height: 80vh;
       height: auto;
       object-fit: contain;
-      border-radius: 10px;
+      border-radius: 13px;
       cursor: zoom-in;
       user-select: none;
       -webkit-user-drag: none;
-      transition: transform 0.25s ease;
+      transition: transform 0.25s ease, filter 0.25s ease;
     }
 
     .gallery-image:hover {
-      transform: scale(1.03);
+      filter: brightness(1.12);
+      transform: scale(1.025);
+    }
+
+    .view-image-button {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      min-height: 42px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 11px;
+      background: rgba(25, 25, 25, 0.88);
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      touch-action: manipulation;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    }
+
+    .view-image-button:hover {
+      border-color: var(--gold);
+      background: rgba(95, 75, 42, 0.96);
     }
 
     /* Fullscreen viewer */
@@ -194,26 +261,35 @@
     }
 
     /*
-      This grid creates a safe viewing area:
-      - top space for zoom controls
-      - side space for next/previous buttons
-      - bottom space for page number
+      Dedicated central viewing area.
+
+      The image is never placed beneath:
+      - top zoom controls
+      - side navigation controls
+      - bottom page counter
+      - close button
     */
     .viewer-layout {
       position: absolute;
       inset:
-        calc(78px + env(safe-area-inset-top))
-        calc(86px + env(safe-area-inset-right))
-        calc(70px + env(safe-area-inset-bottom))
-        calc(86px + env(safe-area-inset-left));
+        calc(88px + env(safe-area-inset-top))
+        calc(108px + env(safe-area-inset-right))
+        calc(88px + env(safe-area-inset-bottom))
+        calc(108px + env(safe-area-inset-left));
 
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 18px;
-      background: #050505;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      background:
+        radial-gradient(
+          circle at center,
+          #111 0%,
+          #050505 70%,
+          #000 100%
+        );
       touch-action: none;
       overscroll-behavior: none;
       cursor: grab;
@@ -230,7 +306,7 @@
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      border-radius: 8px;
+      border-radius: 9px;
       user-select: none;
       -webkit-user-drag: none;
       transform: translate3d(0, 0, 0) scale(1);
@@ -238,41 +314,41 @@
       will-change: transform;
     }
 
-    /* Top zoom controls */
+    /* Zoom controls above image */
     .top-controls {
       position: absolute;
       top: calc(14px + env(safe-area-inset-top));
       left: 50%;
-      z-index: 10;
+      z-index: 20;
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 7px 9px;
+      padding: 8px 10px;
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 17px;
       background: var(--panel);
       direction: ltr;
       transform: translateX(-50%);
       touch-action: manipulation;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
 
-    /* Bottom page counter */
+    /* Page number below image */
     .bottom-controls {
       position: absolute;
       bottom: calc(14px + env(safe-area-inset-bottom));
       left: 50%;
-      z-index: 10;
+      z-index: 20;
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 7px 12px;
+      padding: 8px 14px;
       border: 1px solid var(--border);
-      border-radius: 20px;
+      border-radius: 22px;
       background: var(--panel);
       transform: translateX(-50%);
       touch-action: manipulation;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
 
     .control-button,
@@ -282,8 +358,8 @@
       justify-content: center;
       align-items: center;
       border: 1px solid rgba(255, 255, 255, 0.4);
-      border-radius: 11px;
-      background: rgba(45, 45, 45, 0.96);
+      border-radius: 12px;
+      background: rgba(45, 45, 45, 0.97);
       color: #fff;
       cursor: pointer;
       user-select: none;
@@ -291,14 +367,16 @@
       transition:
         background 0.2s ease,
         transform 0.2s ease,
-        border-color 0.2s ease;
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     .control-button:hover,
     .close-button:hover,
     .nav-button:hover {
       border-color: var(--gold);
-      background: rgba(95, 75, 42, 0.95);
+      background: rgba(95, 75, 42, 0.96);
+      box-shadow: 0 0 15px rgba(214, 173, 96, 0.18);
     }
 
     .control-button:active,
@@ -307,9 +385,9 @@
     }
 
     .control-button {
-      width: 44px;
-      height: 44px;
-      font-size: 21px;
+      width: 46px;
+      height: 46px;
+      font-size: 22px;
     }
 
     .reset-button {
@@ -320,11 +398,12 @@
     }
 
     .zoom-level {
-      min-width: 58px;
+      min-width: 62px;
       color: #fff;
       text-align: center;
-      font-size: 14px;
       direction: ltr;
+      font-size: 14px;
+      font-weight: bold;
     }
 
     /* Close button */
@@ -332,24 +411,24 @@
       position: absolute;
       top: calc(14px + env(safe-area-inset-top));
       right: calc(18px + env(safe-area-inset-right));
-      z-index: 12;
-      width: 48px;
-      height: 44px;
-      font-size: 31px;
+      z-index: 25;
+      width: 50px;
+      height: 46px;
+      font-size: 32px;
       line-height: 1;
     }
 
-    /* Side navigation */
+    /* Side navigation buttons */
     .nav-button {
       position: absolute;
       top: 50%;
-      z-index: 11;
-      width: 58px;
-      height: 78px;
-      font-size: 38px;
+      z-index: 25;
+      width: 66px;
+      height: 88px;
+      font-size: 42px;
       line-height: 1;
       transform: translateY(-50%);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
     }
 
     .nav-button:active {
@@ -357,39 +436,38 @@
     }
 
     .previous-button {
-      left: calc(14px + env(safe-area-inset-left));
+      left: calc(18px + env(safe-area-inset-left));
     }
 
     .next-button {
-      right: calc(14px + env(safe-area-inset-right));
+      right: calc(18px + env(safe-area-inset-right));
     }
 
     .image-counter {
-      min-width: 60px;
+      min-width: 65px;
       color: #fff;
       text-align: center;
       direction: ltr;
-      font-size: 15px;
+      font-size: 16px;
       font-weight: bold;
     }
 
     .counter-label {
       color: var(--gold-light);
-      font-size: 12px;
+      font-size: 13px;
     }
 
-    /* Small help hint */
     .gesture-hint {
       position: absolute;
-      bottom: calc(15px + env(safe-area-inset-bottom));
       right: calc(18px + env(safe-area-inset-right));
-      z-index: 8;
-      color: rgba(255, 255, 255, 0.65);
+      bottom: calc(17px + env(safe-area-inset-bottom));
+      z-index: 15;
+      color: var(--muted);
       font-size: 12px;
       pointer-events: none;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
       .gallery {
         min-height: calc(100dvh - 62px);
         flex-direction: column;
@@ -400,27 +478,28 @@
         min-height: 62px;
       }
 
-      .gallery-image {
+      .gallery-card {
         max-width: 100%;
         max-height: 75vh;
       }
 
-      /*
-        On small screens, the center viewing area is still
-        separated from all controls.
-      */
+      .gallery-image {
+        max-height: 75vh;
+      }
+
       .viewer-layout {
         inset:
-          calc(70px + env(safe-area-inset-top))
-          calc(62px + env(safe-area-inset-right))
-          calc(62px + env(safe-area-inset-bottom))
-          calc(62px + env(safe-area-inset-left));
-        border-radius: 12px;
+          calc(82px + env(safe-area-inset-top))
+          calc(68px + env(safe-area-inset-right))
+          calc(76px + env(safe-area-inset-bottom))
+          calc(68px + env(safe-area-inset-left));
+        border-radius: 14px;
       }
 
       .top-controls {
         top: calc(10px + env(safe-area-inset-top));
         left: 12px;
+        gap: 5px;
         padding: 5px 6px;
         transform: none;
       }
@@ -446,9 +525,9 @@
       }
 
       .nav-button {
-        width: 44px;
-        height: 62px;
-        font-size: 30px;
+        width: 48px;
+        height: 68px;
+        font-size: 32px;
       }
 
       .previous-button {
@@ -465,6 +544,14 @@
 
       .gesture-hint {
         display: none;
+      }
+
+      .view-image-button {
+        right: 8px;
+        bottom: 8px;
+        min-height: 38px;
+        padding: 7px 10px;
+        font-size: 12px;
       }
     }
   </style>
@@ -490,7 +577,9 @@
         class="proceed-button"
         type="button"
       >
-        لفتح المنيو اضغط هنا
+        <span class="button-icon" aria-hidden="true">☕</span>
+        <span>لفتح المنيو اضغط هنا</span>
+        <span class="button-icon" aria-hidden="true">→</span>
       </button>
     </div>
   </section>
@@ -504,17 +593,41 @@
     </header>
 
     <main class="gallery">
-      <img
-        src="mazaj1.webp"
-        alt="منيو مزاج كافيه - الصفحة الأولى"
-        class="gallery-image"
-      >
+      <div class="gallery-card">
+        <img
+          src="mazaj1.webp"
+          alt="منيو مزاج كافيه - الصفحة الأولى"
+          class="gallery-image"
+        >
 
-      <img
-        src="mazaj2.webp"
-        alt="منيو مزاج كافيه - الصفحة الثانية"
-        class="gallery-image"
-      >
+        <button
+          class="view-image-button"
+          type="button"
+          data-image-index="0"
+          aria-label="فتح الصفحة الأولى بالحجم الكامل"
+        >
+          <span aria-hidden="true">🔍</span>
+          <span>اضغط للمشاهدة</span>
+        </button>
+      </div>
+
+      <div class="gallery-card">
+        <img
+          src="mazaj2.webp"
+          alt="منيو مزاج كافيه - الصفحة الثانية"
+          class="gallery-image"
+        >
+
+        <button
+          class="view-image-button"
+          type="button"
+          data-image-index="1"
+          aria-label="فتح الصفحة الثانية بالحجم الكامل"
+        >
+          <span aria-hidden="true">🔍</span>
+          <span>اضغط للمشاهدة</span>
+        </button>
+      </div>
     </main>
   </section>
 
@@ -526,7 +639,7 @@
     aria-modal="true"
     aria-label="عارض صور المنيو"
   >
-    <!-- Image-only viewing area -->
+    <!-- Dedicated image viewing area -->
     <div
       id="viewerLayout"
       class="viewer-layout"
@@ -539,7 +652,7 @@
       >
     </div>
 
-    <!-- Zoom controls above image -->
+    <!-- Zoom controls above the image -->
     <div class="top-controls">
       <button
         id="zoomOutButton"
@@ -590,7 +703,7 @@
       &times;
     </button>
 
-    <!-- Previous image -->
+    <!-- Previous image button -->
     <button
       id="previousButton"
       class="nav-button previous-button"
@@ -601,7 +714,7 @@
       &#10094;
     </button>
 
-    <!-- Next image -->
+    <!-- Next image button -->
     <button
       id="nextButton"
       class="nav-button next-button"
@@ -612,7 +725,7 @@
       &#10095;
     </button>
 
-    <!-- Page number below image -->
+    <!-- Page indicator below the image -->
     <div class="bottom-controls">
       <span class="counter-label">
         صفحة
@@ -638,6 +751,10 @@
 
     const galleryImages = Array.from(
       document.querySelectorAll(".gallery-image")
+    );
+
+    const viewImageButtons = Array.from(
+      document.querySelectorAll(".view-image-button")
     );
 
     const zoomOverlay = document.getElementById("zoomOverlay");
@@ -734,8 +851,13 @@
     }
 
     /*
-      This is the central image-switching function.
-      It works for both the previous and next buttons.
+      This central function changes the current image.
+      It is used by:
+      - Previous button
+      - Next button
+      - Swipe controls
+      - Keyboard arrows
+      - Gallery call-to-action buttons
     */
     function showImage(index) {
       currentIndex =
@@ -812,21 +934,32 @@
       resetZoom();
     }
 
-    // Open gallery
+    // Open the gallery
     proceedButton.addEventListener("click", function () {
       welcomePage.classList.add("hidden");
       galleryPage.classList.remove("hidden");
       window.scrollTo(0, 0);
     });
 
-    // Open selected image
+    // Open an image by clicking its image
     galleryImages.forEach(function (image, index) {
       image.addEventListener("click", function () {
         openViewer(index);
       });
     });
 
-    // Navigation buttons
+    // Open an image with its call-to-action button
+    viewImageButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        const index = Number(
+          button.getAttribute("data-image-index")
+        );
+
+        openViewer(index);
+      });
+    });
+
+    // Previous and next controls
     previousButton.addEventListener("click", function (event) {
       event.stopPropagation();
       showImage(currentIndex - 1);
@@ -837,13 +970,13 @@
       showImage(currentIndex + 1);
     });
 
-    // Close button
+    // Close control
     closeButton.addEventListener("click", function (event) {
       event.stopPropagation();
       closeViewer();
     });
 
-    // Zoom buttons
+    // Zoom controls
     zoomInButton.addEventListener("click", function (event) {
       event.stopPropagation();
       setZoom(scale + ZOOM_STEP);
@@ -876,7 +1009,7 @@
       { passive: false }
     );
 
-    // Double-click zoom
+    // Double-click or double-tap-style zoom
     zoomedImage.addEventListener("dblclick", function (event) {
       event.preventDefault();
 
@@ -884,7 +1017,8 @@
     });
 
     /*
-      Start one-finger dragging or two-finger pinch zoom.
+      One-finger drag when zoomed.
+      Two-finger pinch to zoom.
     */
     viewerLayout.addEventListener(
       "pointerdown",
@@ -926,10 +1060,6 @@
       { passive: false }
     );
 
-    /*
-      Move the zoomed image with one finger.
-      Pinch with two fingers to zoom.
-    */
     viewerLayout.addEventListener(
       "pointermove",
       function (event) {
@@ -944,6 +1074,7 @@
           y: event.clientY
         });
 
+        // Pinch zoom
         if (pointers.size === 2) {
           const points = Array.from(
             pointers.values()
@@ -967,6 +1098,7 @@
           return;
         }
 
+        // Drag the image when zoomed
         if (isDragging && scale > 1) {
           translateX =
             startingTranslateX +
@@ -1004,7 +1136,7 @@
       finishPointer
     );
 
-    // Keyboard controls
+    // Keyboard navigation and zoom
     document.addEventListener("keydown", function (event) {
       if (!zoomOverlay.classList.contains("active")) {
         return;
@@ -1038,7 +1170,7 @@
       }
     });
 
-    // Keep the image inside its reserved viewing area
+    // Keep the image inside the reserved viewer after resizing
     window.addEventListener("resize", function () {
       if (zoomOverlay.classList.contains("active")) {
         limitPan();
@@ -1046,7 +1178,1202 @@
       }
     });
 
-    // Close if fullscreen is exited from browser controls
+    // Close if the browser exits fullscreen
+    document.addEventListener("fullscreenchange", function () {
+      if (
+        !document.fullscreenElement &&
+        zoomOverlay.classList.contains("active")
+      ) {
+        zoomOverlay.classList.remove("active");
+        zoomedImage.src = "";
+        document.body.style.overflow = "";
+        resetZoom();
+      }
+    });
+  </script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>مزاج كافيه</title>
+
+  <link rel="icon" type="image/png" href="mazaj.ico">
+
+  <style>
+    :root {
+      --gold: #d6ad60;
+      --gold-light: #f2d18b;
+      --gold-dark: #9d6e28;
+      --black: #000;
+      --panel: rgba(28, 28, 28, 0.96);
+      --border: rgba(255, 255, 255, 0.28);
+      --muted: rgba(255, 255, 255, 0.7);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
+      touch-action: pan-y;
+    }
+
+    body {
+      background: var(--black);
+      color: #fff;
+      font-family: Arial, Tahoma, sans-serif;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    button:focus-visible {
+      outline: 3px solid var(--gold-light);
+      outline-offset: 3px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Welcome screen */
+    #welcomePage {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding:
+        max(24px, env(safe-area-inset-top))
+        max(24px, env(safe-area-inset-right))
+        max(24px, env(safe-area-inset-bottom))
+        max(24px, env(safe-area-inset-left));
+      text-align: center;
+      background:
+        radial-gradient(
+          circle at center,
+          #2b2b2b 0%,
+          #0b0b0b 50%,
+          #000 100%
+        );
+    }
+
+    .welcome-card {
+      width: min(100%, 560px);
+      padding: 36px 22px;
+      border: 1px solid rgba(214, 173, 96, 0.62);
+      border-radius: 24px;
+      background: rgba(15, 15, 15, 0.96);
+      box-shadow:
+        0 0 40px rgba(214, 173, 96, 0.18),
+        0 18px 50px rgba(0, 0, 0, 0.55);
+    }
+
+    .welcome-logo {
+      display: block;
+      width: min(75vw, 300px);
+      max-height: 280px;
+      margin: 0 auto 25px;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .welcome-message {
+      margin: 0 0 28px;
+      color: var(--gold-light);
+      font-size: clamp(25px, 5vw, 42px);
+      line-height: 1.7;
+    }
+
+    .proceed-button {
+      min-width: min(100%, 330px);
+      min-height: 58px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px;
+      border: 1px solid var(--gold);
+      border-radius: 16px;
+      background: linear-gradient(135deg, #d6ad60, #a7782d);
+      color: #111;
+      font-size: clamp(18px, 4vw, 23px);
+      font-weight: bold;
+      cursor: pointer;
+      touch-action: manipulation;
+      box-shadow: 0 10px 25px rgba(214, 173, 96, 0.22);
+      transition:
+        transform 0.2s ease,
+        filter 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .proceed-button:hover {
+      filter: brightness(1.12);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(214, 173, 96, 0.35);
+    }
+
+    .button-icon {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.35em;
+      line-height: 1;
+    }
+
+    /* Gallery screen */
+    #galleryPage {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: #000;
+    }
+
+    .gallery-header {
+      min-height: 68px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding:
+        calc(12px + env(safe-area-inset-top))
+        max(18px, env(safe-area-inset-right))
+        12px
+        max(18px, env(safe-area-inset-left));
+      border-bottom: 1px solid #333;
+      background: #111;
+    }
+
+    .page-status {
+      color: var(--gold-light);
+      font-size: clamp(16px, 3vw, 22px);
+      font-weight: bold;
+    }
+
+    .gallery {
+      min-height: calc(100vh - 68px);
+      min-height: calc(100dvh - 68px);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+      touch-action: pan-y;
+      overscroll-behavior-x: none;
+    }
+
+    .gallery-card {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      max-width: 45%;
+      max-height: 80vh;
+      overflow: hidden;
+      border: 1px solid rgba(214, 173, 96, 0.22);
+      border-radius: 14px;
+      background: #090909;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    .gallery-image {
+      display: block;
+      width: auto;
+      max-width: 100%;
+      max-height: 80vh;
+      height: auto;
+      object-fit: contain;
+      border-radius: 13px;
+      cursor: zoom-in;
+      user-select: none;
+      -webkit-user-drag: none;
+      transition: transform 0.25s ease, filter 0.25s ease;
+    }
+
+    .gallery-image:hover {
+      filter: brightness(1.12);
+      transform: scale(1.025);
+    }
+
+    .view-image-button {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      min-height: 42px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 11px;
+      background: rgba(25, 25, 25, 0.88);
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      touch-action: manipulation;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    }
+
+    .view-image-button:hover {
+      border-color: var(--gold);
+      background: rgba(95, 75, 42, 0.96);
+    }
+
+    /* Fullscreen viewer */
+    .zoom-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      overflow: hidden;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      overscroll-behavior: none;
+      touch-action: none;
+    }
+
+    .zoom-overlay.active {
+      display: flex;
+    }
+
+    /*
+      Dedicated central viewing area.
+
+      The image is never placed beneath:
+      - top zoom controls
+      - side navigation controls
+      - bottom page counter
+      - close button
+    */
+    .viewer-layout {
+      position: absolute;
+      inset:
+        calc(88px + env(safe-area-inset-top))
+        calc(108px + env(safe-area-inset-right))
+        calc(88px + env(safe-area-inset-bottom))
+        calc(108px + env(safe-area-inset-left));
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      background:
+        radial-gradient(
+          circle at center,
+          #111 0%,
+          #050505 70%,
+          #000 100%
+        );
+      touch-action: none;
+      overscroll-behavior: none;
+      cursor: grab;
+    }
+
+    .viewer-layout.dragging {
+      cursor: grabbing;
+    }
+
+    .zoomed-image {
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 9px;
+      user-select: none;
+      -webkit-user-drag: none;
+      transform: translate3d(0, 0, 0) scale(1);
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    /* Zoom controls above image */
+    .top-controls {
+      position: absolute;
+      top: calc(14px + env(safe-area-inset-top));
+      left: 50%;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      background: var(--panel);
+      direction: ltr;
+      transform: translateX(-50%);
+      touch-action: manipulation;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Page number below image */
+    .bottom-controls {
+      position: absolute;
+      bottom: calc(14px + env(safe-area-inset-bottom));
+      left: 50%;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--panel);
+      transform: translateX(-50%);
+      touch-action: manipulation;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .control-button,
+    .close-button,
+    .nav-button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 12px;
+      background: rgba(45, 45, 45, 0.97);
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .control-button:hover,
+    .close-button:hover,
+    .nav-button:hover {
+      border-color: var(--gold);
+      background: rgba(95, 75, 42, 0.96);
+      box-shadow: 0 0 15px rgba(214, 173, 96, 0.18);
+    }
+
+    .control-button:active,
+    .close-button:active {
+      transform: scale(0.92);
+    }
+
+    .control-button {
+      width: 46px;
+      height: 46px;
+      font-size: 22px;
+    }
+
+    .reset-button {
+      width: auto;
+      padding: 0 13px;
+      color: var(--gold-light);
+      font-size: 14px;
+    }
+
+    .zoom-level {
+      min-width: 62px;
+      color: #fff;
+      text-align: center;
+      direction: ltr;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    /* Close button */
+    .close-button {
+      position: absolute;
+      top: calc(14px + env(safe-area-inset-top));
+      right: calc(18px + env(safe-area-inset-right));
+      z-index: 25;
+      width: 50px;
+      height: 46px;
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    /* Side navigation buttons */
+    .nav-button {
+      position: absolute;
+      top: 50%;
+      z-index: 25;
+      width: 66px;
+      height: 88px;
+      font-size: 42px;
+      line-height: 1;
+      transform: translateY(-50%);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+    }
+
+    .nav-button:active {
+      transform: translateY(-50%) scale(0.92);
+    }
+
+    .previous-button {
+      left: calc(18px + env(safe-area-inset-left));
+    }
+
+    .next-button {
+      right: calc(18px + env(safe-area-inset-right));
+    }
+
+    .image-counter {
+      min-width: 65px;
+      color: #fff;
+      text-align: center;
+      direction: ltr;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .counter-label {
+      color: var(--gold-light);
+      font-size: 13px;
+    }
+
+    .gesture-hint {
+      position: absolute;
+      right: calc(18px + env(safe-area-inset-right));
+      bottom: calc(17px + env(safe-area-inset-bottom));
+      z-index: 15;
+      color: var(--muted);
+      font-size: 12px;
+      pointer-events: none;
+    }
+
+    @media (max-width: 700px) {
+      .gallery {
+        min-height: calc(100dvh - 62px);
+        flex-direction: column;
+        padding: 16px 10px;
+      }
+
+      .gallery-header {
+        min-height: 62px;
+      }
+
+      .gallery-card {
+        max-width: 100%;
+        max-height: 75vh;
+      }
+
+      .gallery-image {
+        max-height: 75vh;
+      }
+
+      .viewer-layout {
+        inset:
+          calc(82px + env(safe-area-inset-top))
+          calc(68px + env(safe-area-inset-right))
+          calc(76px + env(safe-area-inset-bottom))
+          calc(68px + env(safe-area-inset-left));
+        border-radius: 14px;
+      }
+
+      .top-controls {
+        top: calc(10px + env(safe-area-inset-top));
+        left: 12px;
+        gap: 5px;
+        padding: 5px 6px;
+        transform: none;
+      }
+
+      .control-button {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+      }
+
+      .reset-button {
+        width: auto;
+        padding: 0 9px;
+        font-size: 12px;
+      }
+
+      .close-button {
+        top: calc(10px + env(safe-area-inset-top));
+        right: calc(10px + env(safe-area-inset-right));
+        width: 42px;
+        height: 38px;
+        font-size: 27px;
+      }
+
+      .nav-button {
+        width: 48px;
+        height: 68px;
+        font-size: 32px;
+      }
+
+      .previous-button {
+        left: calc(7px + env(safe-area-inset-left));
+      }
+
+      .next-button {
+        right: calc(7px + env(safe-area-inset-right));
+      }
+
+      .bottom-controls {
+        bottom: calc(10px + env(safe-area-inset-bottom));
+      }
+
+      .gesture-hint {
+        display: none;
+      }
+
+      .view-image-button {
+        right: 8px;
+        bottom: 8px;
+        min-height: 38px;
+        padding: 7px 10px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Welcome screen -->
+  <section id="welcomePage">
+    <div class="welcome-card">
+      <img
+        src="mazaj.webp"
+        alt="شعار كافيه مزاج"
+        class="welcome-logo"
+      >
+
+      <h1 class="welcome-message">
+        أهلاً بكم في كافيه مزاج
+      </h1>
+
+      <button
+        id="proceedButton"
+        class="proceed-button"
+        type="button"
+      >
+        <span class="button-icon" aria-hidden="true">☕</span>
+        <span>لفتح المنيو اضغط هنا</span>
+        <span class="button-icon" aria-hidden="true">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Gallery screen -->
+  <section id="galleryPage" class="hidden">
+    <header class="gallery-header">
+      <div class="page-status">
+        الصفحة 2 من 2 — المنيو
+      </div>
+    </header>
+
+    <main class="gallery">
+      <div class="gallery-card">
+        <img
+          src="mazaj1.webp"
+          alt="منيو مزاج كافيه - الصفحة الأولى"
+          class="gallery-image"
+        >
+
+        <button
+          class="view-image-button"
+          type="button"
+          data-image-index="0"
+          aria-label="فتح الصفحة الأولى بالحجم الكامل"
+        >
+          <span aria-hidden="true">🔍</span>
+          <span>اضغط للمشاهدة</span>
+        </button>
+      </div>
+
+      <div class="gallery-card">
+        <img
+          src="mazaj2.webp"
+          alt="منيو مزاج كافيه - الصفحة الثانية"
+          class="gallery-image"
+        >
+
+        <button
+          class="view-image-button"
+          type="button"
+          data-image-index="1"
+          aria-label="فتح الصفحة الثانية بالحجم الكامل"
+        >
+          <span aria-hidden="true">🔍</span>
+          <span>اضغط للمشاهدة</span>
+        </button>
+      </div>
+    </main>
+  </section>
+
+  <!-- Fullscreen image viewer -->
+  <div
+    id="zoomOverlay"
+    class="zoom-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-label="عارض صور المنيو"
+  >
+    <!-- Dedicated image viewing area -->
+    <div
+      id="viewerLayout"
+      class="viewer-layout"
+    >
+      <img
+        id="zoomedImage"
+        class="zoomed-image"
+        src=""
+        alt=""
+      >
+    </div>
+
+    <!-- Zoom controls above the image -->
+    <div class="top-controls">
+      <button
+        id="zoomOutButton"
+        class="control-button"
+        type="button"
+        aria-label="تصغير"
+        title="تصغير"
+      >
+        −
+      </button>
+
+      <span
+        id="zoomLevel"
+        class="zoom-level"
+      >
+        100%
+      </span>
+
+      <button
+        id="zoomInButton"
+        class="control-button"
+        type="button"
+        aria-label="تكبير"
+        title="تكبير"
+      >
+        +
+      </button>
+
+      <button
+        id="resetButton"
+        class="control-button reset-button"
+        type="button"
+        aria-label="إعادة ضبط التكبير"
+        title="إعادة ضبط التكبير"
+      >
+        Reset
+      </button>
+    </div>
+
+    <!-- Close button -->
+    <button
+      id="closeButton"
+      class="close-button"
+      type="button"
+      aria-label="إغلاق"
+      title="إغلاق"
+    >
+      &times;
+    </button>
+
+    <!-- Previous image button -->
+    <button
+      id="previousButton"
+      class="nav-button previous-button"
+      type="button"
+      aria-label="الصورة السابقة"
+      title="الصورة السابقة"
+    >
+      &#10094;
+    </button>
+
+    <!-- Next image button -->
+    <button
+      id="nextButton"
+      class="nav-button next-button"
+      type="button"
+      aria-label="الصورة التالية"
+      title="الصورة التالية"
+    >
+      &#10095;
+    </button>
+
+    <!-- Page indicator below the image -->
+    <div class="bottom-controls">
+      <span class="counter-label">
+        صفحة
+      </span>
+
+      <span
+        id="imageCounter"
+        class="image-counter"
+      >
+        1 / 2
+      </span>
+    </div>
+
+    <div class="gesture-hint">
+      اسحب الصورة عند التكبير • استخدم الأسهم للتبديل
+    </div>
+  </div>
+
+  <script>
+    const welcomePage = document.getElementById("welcomePage");
+    const galleryPage = document.getElementById("galleryPage");
+    const proceedButton = document.getElementById("proceedButton");
+
+    const galleryImages = Array.from(
+      document.querySelectorAll(".gallery-image")
+    );
+
+    const viewImageButtons = Array.from(
+      document.querySelectorAll(".view-image-button")
+    );
+
+    const zoomOverlay = document.getElementById("zoomOverlay");
+    const viewerLayout = document.getElementById("viewerLayout");
+    const zoomedImage = document.getElementById("zoomedImage");
+
+    const closeButton = document.getElementById("closeButton");
+    const previousButton = document.getElementById("previousButton");
+    const nextButton = document.getElementById("nextButton");
+
+    const zoomInButton = document.getElementById("zoomInButton");
+    const zoomOutButton = document.getElementById("zoomOutButton");
+    const resetButton = document.getElementById("resetButton");
+
+    const zoomLevel = document.getElementById("zoomLevel");
+    const imageCounter = document.getElementById("imageCounter");
+
+    let currentIndex = 0;
+
+    let scale = 1;
+    let translateX = 0;
+    let translateY = 0;
+
+    const MIN_ZOOM = 1;
+    const MAX_ZOOM = 6;
+    const ZOOM_STEP = 0.25;
+
+    let pointers = new Map();
+    let lastPinchDistance = null;
+
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let startingTranslateX = 0;
+    let startingTranslateY = 0;
+
+    function updateTransform() {
+      zoomedImage.style.transform =
+        `translate3d(${translateX}px, ${translateY}px, 0)
+         scale(${scale})`;
+
+      zoomLevel.textContent =
+        `${Math.round(scale * 100)}%`;
+    }
+
+    function limitPan() {
+      const imageWidth =
+        zoomedImage.clientWidth * scale;
+
+      const imageHeight =
+        zoomedImage.clientHeight * scale;
+
+      const maximumX = Math.max(
+        0,
+        (imageWidth - viewerLayout.clientWidth) / 2
+      );
+
+      const maximumY = Math.max(
+        0,
+        (imageHeight - viewerLayout.clientHeight) / 2
+      );
+
+      translateX = Math.max(
+        -maximumX,
+        Math.min(maximumX, translateX)
+      );
+
+      translateY = Math.max(
+        -maximumY,
+        Math.min(maximumY, translateY)
+      );
+    }
+
+    function setZoom(newScale) {
+      scale = Math.max(
+        MIN_ZOOM,
+        Math.min(MAX_ZOOM, newScale)
+      );
+
+      if (scale === MIN_ZOOM) {
+        translateX = 0;
+        translateY = 0;
+      }
+
+      limitPan();
+      updateTransform();
+    }
+
+    function resetZoom() {
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+      updateTransform();
+    }
+
+    /*
+      This central function changes the current image.
+      It is used by:
+      - Previous button
+      - Next button
+      - Swipe controls
+      - Keyboard arrows
+      - Gallery call-to-action buttons
+    */
+    function showImage(index) {
+      currentIndex =
+        (index + galleryImages.length) %
+        galleryImages.length;
+
+      const selectedImage =
+        galleryImages[currentIndex];
+
+      zoomedImage.src = selectedImage.src;
+      zoomedImage.alt = selectedImage.alt;
+
+      imageCounter.textContent =
+        `${currentIndex + 1} / ${galleryImages.length}`;
+
+      resetZoom();
+    }
+
+    async function openViewer(index) {
+      showImage(index);
+
+      zoomOverlay.classList.add("active");
+      document.body.style.overflow = "hidden";
+
+      try {
+        if (
+          !document.fullscreenElement &&
+          zoomOverlay.requestFullscreen
+        ) {
+          await zoomOverlay.requestFullscreen();
+        }
+      } catch (error) {
+        console.log("Fullscreen unavailable:", error);
+      }
+
+      try {
+        if (
+          screen.orientation &&
+          screen.orientation.lock
+        ) {
+          await screen.orientation.lock("landscape");
+        }
+      } catch (error) {
+        console.log("Landscape lock unavailable:", error);
+      }
+    }
+
+    async function closeViewer() {
+      try {
+        if (
+          screen.orientation &&
+          screen.orientation.unlock
+        ) {
+          screen.orientation.unlock();
+        }
+      } catch (error) {
+        console.log("Orientation unlock unavailable:", error);
+      }
+
+      try {
+        if (
+          document.fullscreenElement &&
+          document.exitFullscreen
+        ) {
+          await document.exitFullscreen();
+        }
+      } catch (error) {
+        console.log("Could not exit fullscreen:", error);
+      }
+
+      zoomOverlay.classList.remove("active");
+      zoomedImage.src = "";
+      document.body.style.overflow = "";
+      resetZoom();
+    }
+
+    // Open the gallery
+    proceedButton.addEventListener("click", function () {
+      welcomePage.classList.add("hidden");
+      galleryPage.classList.remove("hidden");
+      window.scrollTo(0, 0);
+    });
+
+    // Open an image by clicking its image
+    galleryImages.forEach(function (image, index) {
+      image.addEventListener("click", function () {
+        openViewer(index);
+      });
+    });
+
+    // Open an image with its call-to-action button
+    viewImageButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        const index = Number(
+          button.getAttribute("data-image-index")
+        );
+
+        openViewer(index);
+      });
+    });
+
+    // Previous and next controls
+    previousButton.addEventListener("click", function (event) {
+      event.stopPropagation();
+      showImage(currentIndex - 1);
+    });
+
+    nextButton.addEventListener("click", function (event) {
+      event.stopPropagation();
+      showImage(currentIndex + 1);
+    });
+
+    // Close control
+    closeButton.addEventListener("click", function (event) {
+      event.stopPropagation();
+      closeViewer();
+    });
+
+    // Zoom controls
+    zoomInButton.addEventListener("click", function (event) {
+      event.stopPropagation();
+      setZoom(scale + ZOOM_STEP);
+    });
+
+    zoomOutButton.addEventListener("click", function (event) {
+      event.stopPropagation();
+      setZoom(scale - ZOOM_STEP);
+    });
+
+    resetButton.addEventListener("click", function (event) {
+      event.stopPropagation();
+      resetZoom();
+    });
+
+    // Mouse-wheel zoom
+    viewerLayout.addEventListener(
+      "wheel",
+      function (event) {
+        event.preventDefault();
+
+        setZoom(
+          scale + (
+            event.deltaY < 0
+              ? ZOOM_STEP
+              : -ZOOM_STEP
+          )
+        );
+      },
+      { passive: false }
+    );
+
+    // Double-click or double-tap-style zoom
+    zoomedImage.addEventListener("dblclick", function (event) {
+      event.preventDefault();
+
+      setZoom(scale === 1 ? 2 : 1);
+    });
+
+    /*
+      One-finger drag when zoomed.
+      Two-finger pinch to zoom.
+    */
+    viewerLayout.addEventListener(
+      "pointerdown",
+      function (event) {
+        event.preventDefault();
+
+        viewerLayout.setPointerCapture(event.pointerId);
+
+        pointers.set(event.pointerId, {
+          x: event.clientX,
+          y: event.clientY
+        });
+
+        if (pointers.size === 1 && scale > 1) {
+          isDragging = true;
+          viewerLayout.classList.add("dragging");
+
+          dragStartX = event.clientX;
+          dragStartY = event.clientY;
+
+          startingTranslateX = translateX;
+          startingTranslateY = translateY;
+        }
+
+        if (pointers.size === 2) {
+          isDragging = false;
+          viewerLayout.classList.remove("dragging");
+
+          const points = Array.from(
+            pointers.values()
+          );
+
+          lastPinchDistance = Math.hypot(
+            points[1].x - points[0].x,
+            points[1].y - points[0].y
+          );
+        }
+      },
+      { passive: false }
+    );
+
+    viewerLayout.addEventListener(
+      "pointermove",
+      function (event) {
+        if (!pointers.has(event.pointerId)) {
+          return;
+        }
+
+        event.preventDefault();
+
+        pointers.set(event.pointerId, {
+          x: event.clientX,
+          y: event.clientY
+        });
+
+        // Pinch zoom
+        if (pointers.size === 2) {
+          const points = Array.from(
+            pointers.values()
+          );
+
+          const newPinchDistance = Math.hypot(
+            points[1].x - points[0].x,
+            points[1].y - points[0].y
+          );
+
+          if (lastPinchDistance) {
+            const distanceChange =
+              newPinchDistance - lastPinchDistance;
+
+            setZoom(
+              scale + distanceChange * 0.01
+            );
+          }
+
+          lastPinchDistance = newPinchDistance;
+          return;
+        }
+
+        // Drag the image when zoomed
+        if (isDragging && scale > 1) {
+          translateX =
+            startingTranslateX +
+            event.clientX -
+            dragStartX;
+
+          translateY =
+            startingTranslateY +
+            event.clientY -
+            dragStartY;
+
+          limitPan();
+          updateTransform();
+        }
+      },
+      { passive: false }
+    );
+
+    function finishPointer(event) {
+      pointers.delete(event.pointerId);
+
+      if (pointers.size < 2) {
+        lastPinchDistance = null;
+      }
+
+      if (pointers.size === 0) {
+        isDragging = false;
+        viewerLayout.classList.remove("dragging");
+      }
+    }
+
+    viewerLayout.addEventListener("pointerup", finishPointer);
+    viewerLayout.addEventListener(
+      "pointercancel",
+      finishPointer
+    );
+
+    // Keyboard navigation and zoom
+    document.addEventListener("keydown", function (event) {
+      if (!zoomOverlay.classList.contains("active")) {
+        return;
+      }
+
+      if (event.key === "Escape") {
+        closeViewer();
+      }
+
+      if (event.key === "ArrowLeft") {
+        showImage(currentIndex - 1);
+      }
+
+      if (event.key === "ArrowRight") {
+        showImage(currentIndex + 1);
+      }
+
+      if (
+        event.key === "+" ||
+        event.key === "="
+      ) {
+        setZoom(scale + ZOOM_STEP);
+      }
+
+      if (event.key === "-") {
+        setZoom(scale - ZOOM_STEP);
+      }
+
+      if (event.key === "0") {
+        resetZoom();
+      }
+    });
+
+    // Keep the image inside the reserved viewer after resizing
+    window.addEventListener("resize", function () {
+      if (zoomOverlay.classList.contains("active")) {
+        limitPan();
+        updateTransform();
+      }
+    });
+
+    // Close if the browser exits fullscreen
     document.addEventListener("fullscreenchange", function () {
       if (
         !document.fullscreenElement &&
