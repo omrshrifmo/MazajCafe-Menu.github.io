@@ -2,9 +2,10 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
 
   <title>مزاج كافيه</title>
@@ -16,7 +17,8 @@
       --gold: #d6ad60;
       --gold-light: #f2d18b;
       --black: #000;
-      --panel: #141414;
+      --panel: rgba(28, 28, 28, 0.94);
+      --border: rgba(255, 255, 255, 0.28);
     }
 
     * {
@@ -29,11 +31,6 @@
       min-height: 100%;
       margin: 0;
       overflow-x: hidden;
-
-      /*
-        Prevent horizontal browser back/forward swipe while
-        preserving normal vertical page behavior.
-      */
       overscroll-behavior-x: none;
       touch-action: pan-y;
     }
@@ -55,10 +52,15 @@
     /* Welcome screen */
     #welcomePage {
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 24px;
+      padding:
+        max(24px, env(safe-area-inset-top))
+        max(24px, env(safe-area-inset-right))
+        max(24px, env(safe-area-inset-bottom))
+        max(24px, env(safe-area-inset-left));
       text-align: center;
       background:
         radial-gradient(
@@ -97,7 +99,8 @@
 
     .proceed-button {
       min-width: min(100%, 320px);
-      padding: 15px 24px;
+      min-height: 54px;
+      padding: 14px 24px;
       border: 1px solid var(--gold);
       border-radius: 14px;
       background: linear-gradient(135deg, #d6ad60, #a7782d);
@@ -105,6 +108,7 @@
       font-size: clamp(18px, 4vw, 23px);
       font-weight: bold;
       cursor: pointer;
+      touch-action: manipulation;
       transition: transform 0.2s ease, filter 0.2s ease;
     }
 
@@ -116,6 +120,7 @@
     /* Gallery screen */
     #galleryPage {
       min-height: 100vh;
+      min-height: 100dvh;
       background: #000;
     }
 
@@ -124,7 +129,11 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 12px 18px;
+      padding:
+        calc(12px + env(safe-area-inset-top))
+        max(18px, env(safe-area-inset-right))
+        12px
+        max(18px, env(safe-area-inset-left));
       border-bottom: 1px solid #333;
       background: #111;
     }
@@ -137,17 +146,13 @@
 
     .gallery {
       min-height: calc(100vh - 68px);
+      min-height: calc(100dvh - 68px);
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       align-items: center;
       gap: 20px;
       padding: 20px;
-
-      /*
-        The page itself does not handle horizontal gestures.
-        Image controls remain clickable.
-      */
       touch-action: pan-y;
       overscroll-behavior-x: none;
     }
@@ -180,36 +185,41 @@
       justify-content: center;
       align-items: center;
       background: #000;
-
-      /*
-        Only the viewer captures gestures.
-        This allows custom drag and pinch handling.
-      */
-      touch-action: none;
       overscroll-behavior: none;
+      touch-action: none;
     }
 
     .zoom-overlay.active {
       display: flex;
     }
 
-    .viewer {
+    /*
+      This grid creates a safe viewing area:
+      - top space for zoom controls
+      - side space for next/previous buttons
+      - bottom space for page number
+    */
+    .viewer-layout {
       position: absolute;
-      inset: 0;
+      inset:
+        calc(78px + env(safe-area-inset-top))
+        calc(86px + env(safe-area-inset-right))
+        calc(70px + env(safe-area-inset-bottom))
+        calc(86px + env(safe-area-inset-left));
+
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
-
-      /*
-        Required for custom one-finger dragging and pinch zoom.
-      */
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      background: #050505;
       touch-action: none;
       overscroll-behavior: none;
       cursor: grab;
     }
 
-    .viewer.dragging {
+    .viewer-layout.dragging {
       cursor: grabbing;
     }
 
@@ -217,8 +227,8 @@
       display: block;
       width: auto;
       height: auto;
-      max-width: 95vw;
-      max-height: 95vh;
+      max-width: 100%;
+      max-height: 100%;
       object-fit: contain;
       border-radius: 8px;
       user-select: none;
@@ -228,111 +238,160 @@
       will-change: transform;
     }
 
-    /* Viewer controls */
+    /* Top zoom controls */
     .top-controls {
       position: absolute;
-      top: 15px;
+      top: calc(14px + env(safe-area-inset-top));
       left: 50%;
-      z-index: 5;
+      z-index: 10;
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
+      padding: 7px 9px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--panel);
       direction: ltr;
       transform: translateX(-50%);
       touch-action: manipulation;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Bottom page counter */
+    .bottom-controls {
+      position: absolute;
+      bottom: calc(14px + env(safe-area-inset-bottom));
+      left: 50%;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--panel);
+      transform: translateX(-50%);
+      touch-action: manipulation;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
     .control-button,
     .close-button,
     .nav-button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
       border: 1px solid rgba(255, 255, 255, 0.4);
-      border-radius: 8px;
-      background: rgba(35, 35, 35, 0.92);
+      border-radius: 11px;
+      background: rgba(45, 45, 45, 0.96);
       color: #fff;
       cursor: pointer;
       user-select: none;
       touch-action: manipulation;
-      transition: background 0.2s ease, transform 0.2s ease;
+      transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        border-color 0.2s ease;
     }
 
     .control-button:hover,
     .close-button:hover,
     .nav-button:hover {
-      background: rgba(85, 85, 85, 0.95);
+      border-color: var(--gold);
+      background: rgba(95, 75, 42, 0.95);
     }
 
     .control-button:active,
-    .close-button:active,
-    .nav-button:active {
-      transform: scale(0.94);
+    .close-button:active {
+      transform: scale(0.92);
     }
 
     .control-button {
-      min-width: 42px;
-      height: 42px;
-      padding: 0 10px;
-      font-size: 19px;
+      width: 44px;
+      height: 44px;
+      font-size: 21px;
+    }
+
+    .reset-button {
+      width: auto;
+      padding: 0 13px;
+      color: var(--gold-light);
+      font-size: 14px;
     }
 
     .zoom-level {
       min-width: 58px;
-      padding: 7px 8px;
       color: #fff;
       text-align: center;
       font-size: 14px;
+      direction: ltr;
     }
 
+    /* Close button */
     .close-button {
       position: absolute;
-      top: 15px;
-      right: 20px;
-      z-index: 6;
-      width: 44px;
-      height: 42px;
-      font-size: 30px;
+      top: calc(14px + env(safe-area-inset-top));
+      right: calc(18px + env(safe-area-inset-right));
+      z-index: 12;
+      width: 48px;
+      height: 44px;
+      font-size: 31px;
       line-height: 1;
     }
 
+    /* Side navigation */
     .nav-button {
       position: absolute;
       top: 50%;
-      z-index: 5;
-      width: 56px;
-      height: 74px;
+      z-index: 11;
+      width: 58px;
+      height: 78px;
       font-size: 38px;
       line-height: 1;
       transform: translateY(-50%);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
     }
 
     .nav-button:active {
-      transform: translateY(-50%) scale(0.94);
+      transform: translateY(-50%) scale(0.92);
     }
 
     .previous-button {
-      left: 15px;
+      left: calc(14px + env(safe-area-inset-left));
     }
 
     .next-button {
-      right: 15px;
+      right: calc(14px + env(safe-area-inset-right));
     }
 
     .image-counter {
-      position: absolute;
-      bottom: 18px;
-      left: 50%;
-      z-index: 5;
-      padding: 7px 13px;
-      border-radius: 20px;
-      background: rgba(35, 35, 35, 0.9);
+      min-width: 60px;
       color: #fff;
+      text-align: center;
       direction: ltr;
-      font-size: 14px;
-      transform: translateX(-50%);
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .counter-label {
+      color: var(--gold-light);
+      font-size: 12px;
+    }
+
+    /* Small help hint */
+    .gesture-hint {
+      position: absolute;
+      bottom: calc(15px + env(safe-area-inset-bottom));
+      right: calc(18px + env(safe-area-inset-right));
+      z-index: 8;
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 12px;
+      pointer-events: none;
     }
 
     @media (max-width: 600px) {
       .gallery {
-        min-height: calc(100vh - 62px);
+        min-height: calc(100dvh - 62px);
         flex-direction: column;
         padding: 16px 10px;
       }
@@ -346,36 +405,66 @@
         max-height: 75vh;
       }
 
+      /*
+        On small screens, the center viewing area is still
+        separated from all controls.
+      */
+      .viewer-layout {
+        inset:
+          calc(70px + env(safe-area-inset-top))
+          calc(62px + env(safe-area-inset-right))
+          calc(62px + env(safe-area-inset-bottom))
+          calc(62px + env(safe-area-inset-left));
+        border-radius: 12px;
+      }
+
       .top-controls {
-        top: 12px;
-        left: 15px;
+        top: calc(10px + env(safe-area-inset-top));
+        left: 12px;
+        padding: 5px 6px;
         transform: none;
       }
 
-      .close-button {
-        top: 12px;
-        right: 15px;
+      .control-button {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
       }
 
-      .control-button {
-        min-width: 38px;
+      .reset-button {
+        width: auto;
+        padding: 0 9px;
+        font-size: 12px;
+      }
+
+      .close-button {
+        top: calc(10px + env(safe-area-inset-top));
+        right: calc(10px + env(safe-area-inset-right));
+        width: 42px;
         height: 38px;
-        padding: 0 8px;
-        font-size: 17px;
+        font-size: 27px;
       }
 
       .nav-button {
         width: 44px;
-        height: 60px;
+        height: 62px;
         font-size: 30px;
       }
 
       .previous-button {
-        left: 8px;
+        left: calc(7px + env(safe-area-inset-left));
       }
 
       .next-button {
-        right: 8px;
+        right: calc(7px + env(safe-area-inset-right));
+      }
+
+      .bottom-controls {
+        bottom: calc(10px + env(safe-area-inset-bottom));
+      }
+
+      .gesture-hint {
+        display: none;
       }
     }
   </style>
@@ -437,7 +526,11 @@
     aria-modal="true"
     aria-label="عارض صور المنيو"
   >
-    <div id="viewer" class="viewer">
+    <!-- Image-only viewing area -->
+    <div
+      id="viewerLayout"
+      class="viewer-layout"
+    >
       <img
         id="zoomedImage"
         class="zoomed-image"
@@ -446,12 +539,14 @@
       >
     </div>
 
+    <!-- Zoom controls above image -->
     <div class="top-controls">
       <button
         id="zoomOutButton"
         class="control-button"
         type="button"
         aria-label="تصغير"
+        title="تصغير"
       >
         −
       </button>
@@ -468,52 +563,71 @@
         class="control-button"
         type="button"
         aria-label="تكبير"
+        title="تكبير"
       >
         +
       </button>
 
       <button
         id="resetButton"
-        class="control-button"
+        class="control-button reset-button"
         type="button"
         aria-label="إعادة ضبط التكبير"
+        title="إعادة ضبط التكبير"
       >
         Reset
       </button>
     </div>
 
+    <!-- Close button -->
     <button
       id="closeButton"
       class="close-button"
       type="button"
       aria-label="إغلاق"
+      title="إغلاق"
     >
       &times;
     </button>
 
+    <!-- Previous image -->
     <button
       id="previousButton"
       class="nav-button previous-button"
       type="button"
-      aria-label="الصفحة السابقة"
+      aria-label="الصورة السابقة"
+      title="الصورة السابقة"
     >
       &#10094;
     </button>
 
+    <!-- Next image -->
     <button
       id="nextButton"
       class="nav-button next-button"
       type="button"
-      aria-label="الصفحة التالية"
+      aria-label="الصورة التالية"
+      title="الصورة التالية"
     >
       &#10095;
     </button>
 
-    <div
-      id="imageCounter"
-      class="image-counter"
-    >
-      1 / 2
+    <!-- Page number below image -->
+    <div class="bottom-controls">
+      <span class="counter-label">
+        صفحة
+      </span>
+
+      <span
+        id="imageCounter"
+        class="image-counter"
+      >
+        1 / 2
+      </span>
+    </div>
+
+    <div class="gesture-hint">
+      اسحب الصورة عند التكبير • استخدم الأسهم للتبديل
     </div>
   </div>
 
@@ -527,7 +641,7 @@
     );
 
     const zoomOverlay = document.getElementById("zoomOverlay");
-    const viewer = document.getElementById("viewer");
+    const viewerLayout = document.getElementById("viewerLayout");
     const zoomedImage = document.getElementById("zoomedImage");
 
     const closeButton = document.getElementById("closeButton");
@@ -542,6 +656,7 @@
     const imageCounter = document.getElementById("imageCounter");
 
     let currentIndex = 0;
+
     let scale = 1;
     let translateX = 0;
     let translateY = 0;
@@ -564,21 +679,25 @@
         `translate3d(${translateX}px, ${translateY}px, 0)
          scale(${scale})`;
 
-      zoomLevel.textContent = `${Math.round(scale * 100)}%`;
+      zoomLevel.textContent =
+        `${Math.round(scale * 100)}%`;
     }
 
     function limitPan() {
-      const imageWidth = zoomedImage.clientWidth * scale;
-      const imageHeight = zoomedImage.clientHeight * scale;
+      const imageWidth =
+        zoomedImage.clientWidth * scale;
+
+      const imageHeight =
+        zoomedImage.clientHeight * scale;
 
       const maximumX = Math.max(
         0,
-        (imageWidth - viewer.clientWidth) / 2
+        (imageWidth - viewerLayout.clientWidth) / 2
       );
 
       const maximumY = Math.max(
         0,
-        (imageHeight - viewer.clientHeight) / 2
+        (imageHeight - viewerLayout.clientHeight) / 2
       );
 
       translateX = Math.max(
@@ -614,11 +733,17 @@
       updateTransform();
     }
 
+    /*
+      This is the central image-switching function.
+      It works for both the previous and next buttons.
+    */
     function showImage(index) {
       currentIndex =
-        (index + galleryImages.length) % galleryImages.length;
+        (index + galleryImages.length) %
+        galleryImages.length;
 
-      const selectedImage = galleryImages[currentIndex];
+      const selectedImage =
+        galleryImages[currentIndex];
 
       zoomedImage.src = selectedImage.src;
       zoomedImage.alt = selectedImage.alt;
@@ -647,7 +772,10 @@
       }
 
       try {
-        if (screen.orientation && screen.orientation.lock) {
+        if (
+          screen.orientation &&
+          screen.orientation.lock
+        ) {
           await screen.orientation.lock("landscape");
         }
       } catch (error) {
@@ -657,7 +785,10 @@
 
     async function closeViewer() {
       try {
-        if (screen.orientation && screen.orientation.unlock) {
+        if (
+          screen.orientation &&
+          screen.orientation.unlock
+        ) {
           screen.orientation.unlock();
         }
       } catch (error) {
@@ -681,21 +812,21 @@
       resetZoom();
     }
 
-    // Open gallery page
+    // Open gallery
     proceedButton.addEventListener("click", function () {
       welcomePage.classList.add("hidden");
       galleryPage.classList.remove("hidden");
       window.scrollTo(0, 0);
     });
 
-    // Open an image
+    // Open selected image
     galleryImages.forEach(function (image, index) {
       image.addEventListener("click", function () {
         openViewer(index);
       });
     });
 
-    // Previous and next buttons
+    // Navigation buttons
     previousButton.addEventListener("click", function (event) {
       event.stopPropagation();
       showImage(currentIndex - 1);
@@ -706,11 +837,13 @@
       showImage(currentIndex + 1);
     });
 
+    // Close button
     closeButton.addEventListener("click", function (event) {
       event.stopPropagation();
       closeViewer();
     });
 
+    // Zoom buttons
     zoomInButton.addEventListener("click", function (event) {
       event.stopPropagation();
       setZoom(scale + ZOOM_STEP);
@@ -727,13 +860,17 @@
     });
 
     // Mouse-wheel zoom
-    viewer.addEventListener(
+    viewerLayout.addEventListener(
       "wheel",
       function (event) {
         event.preventDefault();
 
         setZoom(
-          scale + (event.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP)
+          scale + (
+            event.deltaY < 0
+              ? ZOOM_STEP
+              : -ZOOM_STEP
+          )
         );
       },
       { passive: false }
@@ -742,27 +879,19 @@
     // Double-click zoom
     zoomedImage.addEventListener("dblclick", function (event) {
       event.preventDefault();
+
       setZoom(scale === 1 ? 2 : 1);
     });
 
-    // Close when clicking empty space
-    viewer.addEventListener("click", function (event) {
-      if (event.target === viewer && scale === 1) {
-        closeViewer();
-      }
-    });
-
     /*
-      Pointer down:
-      - One finger while zoomed: prepare image dragging.
-      - Two fingers: prepare pinch zoom.
+      Start one-finger dragging or two-finger pinch zoom.
     */
-    viewer.addEventListener(
+    viewerLayout.addEventListener(
       "pointerdown",
       function (event) {
         event.preventDefault();
 
-        viewer.setPointerCapture(event.pointerId);
+        viewerLayout.setPointerCapture(event.pointerId);
 
         pointers.set(event.pointerId, {
           x: event.clientX,
@@ -771,7 +900,7 @@
 
         if (pointers.size === 1 && scale > 1) {
           isDragging = true;
-          viewer.classList.add("dragging");
+          viewerLayout.classList.add("dragging");
 
           dragStartX = event.clientX;
           dragStartY = event.clientY;
@@ -782,9 +911,11 @@
 
         if (pointers.size === 2) {
           isDragging = false;
-          viewer.classList.remove("dragging");
+          viewerLayout.classList.remove("dragging");
 
-          const points = Array.from(pointers.values());
+          const points = Array.from(
+            pointers.values()
+          );
 
           lastPinchDistance = Math.hypot(
             points[1].x - points[0].x,
@@ -796,11 +927,10 @@
     );
 
     /*
-      Pointer move:
-      - One finger while zoomed: move/pan the image.
-      - Two fingers: pinch zoom.
+      Move the zoomed image with one finger.
+      Pinch with two fingers to zoom.
     */
-    viewer.addEventListener(
+    viewerLayout.addEventListener(
       "pointermove",
       function (event) {
         if (!pointers.has(event.pointerId)) {
@@ -815,7 +945,9 @@
         });
 
         if (pointers.size === 2) {
-          const points = Array.from(pointers.values());
+          const points = Array.from(
+            pointers.values()
+          );
 
           const newPinchDistance = Math.hypot(
             points[1].x - points[0].x,
@@ -826,7 +958,9 @@
             const distanceChange =
               newPinchDistance - lastPinchDistance;
 
-            setZoom(scale + distanceChange * 0.01);
+            setZoom(
+              scale + distanceChange * 0.01
+            );
           }
 
           lastPinchDistance = newPinchDistance;
@@ -860,12 +994,15 @@
 
       if (pointers.size === 0) {
         isDragging = false;
-        viewer.classList.remove("dragging");
+        viewerLayout.classList.remove("dragging");
       }
     }
 
-    viewer.addEventListener("pointerup", finishPointer);
-    viewer.addEventListener("pointercancel", finishPointer);
+    viewerLayout.addEventListener("pointerup", finishPointer);
+    viewerLayout.addEventListener(
+      "pointercancel",
+      finishPointer
+    );
 
     // Keyboard controls
     document.addEventListener("keydown", function (event) {
@@ -875,23 +1012,33 @@
 
       if (event.key === "Escape") {
         closeViewer();
-      } else if (event.key === "ArrowLeft") {
+      }
+
+      if (event.key === "ArrowLeft") {
         showImage(currentIndex - 1);
-      } else if (event.key === "ArrowRight") {
+      }
+
+      if (event.key === "ArrowRight") {
         showImage(currentIndex + 1);
-      } else if (
+      }
+
+      if (
         event.key === "+" ||
         event.key === "="
       ) {
         setZoom(scale + ZOOM_STEP);
-      } else if (event.key === "-") {
+      }
+
+      if (event.key === "-") {
         setZoom(scale - ZOOM_STEP);
-      } else if (event.key === "0") {
+      }
+
+      if (event.key === "0") {
         resetZoom();
       }
     });
 
-    // Keep panning within the screen after rotation/resizing
+    // Keep the image inside its reserved viewing area
     window.addEventListener("resize", function () {
       if (zoomOverlay.classList.contains("active")) {
         limitPan();
@@ -899,7 +1046,7 @@
       }
     });
 
-    // Close if the user exits fullscreen using browser controls
+    // Close if fullscreen is exited from browser controls
     document.addEventListener("fullscreenchange", function () {
       if (
         !document.fullscreenElement &&
