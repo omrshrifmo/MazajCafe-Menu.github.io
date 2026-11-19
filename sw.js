@@ -2,6 +2,7 @@ const CACHE_NAME = 'mazaj-menu-v3';
 const STATIC_ASSETS = [
   './',
   'index.html',
+  'site.webmanifest',
   'style.min.css',
   'app.min.js',
   'mazaj.ico',

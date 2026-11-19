@@ -1,0 +1,19 @@
+{
+  "name": "كافيه مزاج — المنيو",
+  "short_name": "منيو مزاج",
+  "description": "قائمة مشروبات ومأكولات كافيه مزاج",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#090A0F",
+  "theme_color": "#090A0F",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "mazaj.webp",
+      "sizes": "1000x1000",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ]
+}
