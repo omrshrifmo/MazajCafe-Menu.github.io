@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mazaj-menu-v3';
+const CACHE_NAME = 'mazaj-menu-v4';
 const STATIC_ASSETS = [
   './',
   'index.html',
